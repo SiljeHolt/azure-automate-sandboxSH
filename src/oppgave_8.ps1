@@ -1,6 +1,7 @@
 param (
     [Parameter()]
     [String]
+    #$UrlKortstokk = "https://azure-gvs-test-cases.azurewebsites.net/api/vinnerDraw"
     $UrlKortstokk = "http://nav-deckofcards.herokuapp.com/shuffle"
     #$UrlKortstokk = "www.noesomikkefinnes.no"
 )
@@ -11,7 +12,7 @@ $response = Invoke-WebRequest -Uri $UrlKortstokk
 
 $kortstokk = $response.content | ConvertFrom-Json
 
-$poengkortstokk = 0
+# $poengkortstokk = 0
 function kortsum {
     param (
         [Parameter()]
@@ -46,9 +47,11 @@ function kortstokkPrint {
     $kortstokktabell
 }
 
-
 Write-Host "Kortstokk: $(kortstokkPrint($kortstokk))"
 Write-Host "Poengsum: $(kortsum($kortstokk))"
+
+
+# Oppgave 6
 
 $meg = $kortstokk[0..1]                                 #Kortstokkens 2 første kort, begynner på 0
 $kortstokk = $kortstokk[2..$kortstokk.Length]                   #Kortstokken minus de to første kortene
@@ -59,3 +62,52 @@ $kortstokk = $kortstokk[2..$kortstokk.Length]
 Write-Host "meg: $(kortstokkPrint($meg))"
 Write-Host "magnus: $(kortstokkPrint($magnus))"
 Write-Host "Kortstokk: $(kortstokkPrint($kortstokk))"
+
+
+# Oppgave 7
+
+
+function skrivUtResultat {
+    param (
+        [string]
+        $vinner,        
+        [object[]]
+        $kortStokkMagnus,
+        [object[]]
+        $kortStokkMeg        
+    )
+    Write-Output "Vinner: $vinner"
+    Write-Output "magnus | $(kortsum -kortstokk $kortStokkMagnus) | $(kortstokkPrint -kortstokk $kortStokkMagnus)"    
+    Write-Output "meg    | $(kortsum -kortstokk $kortStokkMeg) | $(kortstokkPrint -kortstokk $kortStokkMeg)"
+}
+
+# bruker 'blackjack' som et begrep - er 21
+
+$blackjack = 21
+
+if ( ((kortsum -kortstokk $meg) -eq $blackjack) -and ((kortsum -kortstokk $magnus) -eq $blackjack)) {
+    skrivUtResultat -vinner "draw" -kortStokkMagnus $magnus -kortStokkMeg $meg
+    exit
+}
+
+elseif ((kortsum -kortstokk $meg) -eq $blackjack) {
+    skrivUtResultat -vinner "meg" -kortStokkMagnus $magnus -kortStokkMeg $meg
+    exit
+}
+elseif ((kortsum -kortstokk $magnus) -eq $blackjack) {
+    skrivUtResultat -vinner "magnus" -kortStokkMagnus $magnus -kortStokkMeg $meg
+    exit
+}
+
+
+# Oppgave 8
+
+while ((kortsum -kortstokk $meg) -lt 17) {
+    $meg += $kortstokk[0]
+    $kortstokk = $kortstokk[1..$kortstokk.Length]
+}
+
+if ((kortsum -kortstokk $meg) -gt $blackjack) {
+    skrivUtResultat -vinner "magnus" -kortStokkMagnus $magnus -kortStokkMeg $meg
+    exit
+}
