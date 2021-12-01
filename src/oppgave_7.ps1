@@ -51,8 +51,6 @@ Write-Host "Kortstokk: $(kortstokkPrint($kortstokk))"
 Write-Host "Poengsum: $(kortsum($kortstokk))"
 
 
-# Oppgave 6
-
 $meg = $kortstokk[0..1]                                 #Kortstokkens 2 første kort, begynner på 0
 $kortstokk = $kortstokk[2..$kortstokk.Length]                   #Kortstokken minus de to første kortene
 $magnus = $kortstokk[0..1]
